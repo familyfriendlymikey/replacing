@@ -48,7 +48,7 @@ def main
 
 	if modify and not force
 		try
-			let options = { stdio: 'ignore', encoding: 'utf8' }
+			let options = { encoding: 'utf8' }
 			if execSync('git status --porcelain', options)
 				return quit 'Git working directory is not clean (-F to force)'
 		catch e
@@ -59,13 +59,18 @@ def main
 	p!
 	for filename in files
 
+		try
+			continue unless statSync(filename).isFile!
+		catch e
+			p "{red}{e}{clear}"
+			continue
+
 		unless pattern
 			p "{pink}{filename}{clear}"
 			continue
 
 		let temp
 		try
-			continue unless statSync(filename).isFile!
 			temp = readFileSync(filename).toString!
 		catch e
 			p "{red}{e}{clear}"
@@ -81,7 +86,7 @@ def main
 
 		continue unless to_print.length >= 1
 		let dashes = "".padStart(filename.length, "-")
-		p "{pink}{filename}\n{dashes}{clear}\n{to_print}"
+		p "{pink}{filename}\n{dashes}{clear}\n{to_print.trim!}\n"
 
 		continue unless modify
 		try
