@@ -1,9 +1,8 @@
 ## What Is This
 
-`replacing` (`rp`) takes lines of file paths from stdin, and incrementally
-- prints lines with text matching an ECMAScript regex pattern,
-- prints replacements, and
-- modifies the input files.
+This is a search and replace tool that supports searching files with an ECMAScript regex pattern,
+replacing that pattern with a string, and after printing to ensure everything is correct,
+modifying the input files with replacements.
 
 ## Installation
 ```
@@ -11,15 +10,17 @@ npm i -g replacing
 ```
 
 ## Usage
-The argument parsing for `rp` is positional, and any configuration other than what is specified here will throw.
 ```
 cmd | rp [PATTERN [REPLACEMENT [MODIFY [FORCE]]]]
 ```
-- If 0 arguments, simply print the sorted file paths passed through stdin.
-- If 1 argument, print lines with text matching the specified regex pattern.
-- If 2 arguments, print matching text with replacements.
-- If the 3rd argument is `-M` and you are in a clean working git directory, modify the input files accordingly.
-- If the 4th argument is `-F`, modify the input files regardless of git status.
+The argument parsing for `rp` is positional and depends on the number of arguments provided:
+
+0. Simply print the sorted file paths passed through stdin.
+1. Print lines with text matching the specified regex pattern.
+2. Print with replacements. Ampersands (`&`) in the replacement string will be substituted with the corresponding match.
+Literal ampersands can be specified with `\&`.
+3. Modify the input files accordingly. This argument *must* be `-M` and you must be in a clean working git directory.
+4. Forcibly modify the input files regardless of git status. This argument *must* be `-F`.
 
 ## Examples
 
@@ -38,19 +39,24 @@ Print lines replacing matched pattern `config` with text `store.config`:
 fd | rp 'config' 'store.config'
 ```
 
-Modify files replacing matched pattern `config` with text `store.config`:
+Same as above:
 ```
-fd | rp 'config' 'store.config' -M
+fd | rp 'config' 'store.&'
 ```
 
-Modify regardless of git status:
+Modify files, replacing matched pattern `config` with text `store.config`:
 ```
-fd | rp 'config' 'store.config' -M -F
+fd | rp 'config' 'store.&' -M
+```
+
+Forcibly modify regardless of git status:
+```
+fd | rp 'config' 'store.&' -M -F
 ```
 
 Lookarounds and word boundaries work. Print lines matching the *word* `config` not after `store.`, replacing with `store.config`:
 ```
-fd | rp '(?<!store\.)\bconfig\b' 'store.config'
+fd | rp '(?<!store\.)\bconfig\b' 'store.&'
 ```
 
 ## Tips

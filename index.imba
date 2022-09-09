@@ -3,6 +3,7 @@ const green = "\x1b[32m"
 const pink = "\x1b[35m"
 const red = "\x1b[31m"
 const cyan = "\x1b[36m"
+const blue = "\x1b[34m"
 const clear = "\x1b[0m"
 const help = "\nSee README for usage instructions: https://github.com/familyfriendlymikey/replacing"
 
@@ -21,12 +22,18 @@ def main
 	
 	let args = process.argv.slice(2)
 
-	if let pattern = args.shift!
+	if typeof (let pattern = args.shift!) is 'string'
 		pattern = new RegExp pattern, "g"
 		p "\nPATTERN: {cyan}{pattern}{clear}"
 
+	let substitute_match
 	if typeof (let replacement = args.shift!) is 'string'
 		p "\nREPLACEMENT: {cyan}{replacement}{clear}"
+		substitute_match = do
+			let r = replacement.replaceAll(/(?<!\\)&/g,"{blue}{$1}{green}")
+			r.replaceAll('\\&','&')
+	else
+		substitute_match = do $1
 
 	if let modify = args.shift!
 		return quit 'Invalid args' unless modify is '-M'
@@ -63,11 +70,12 @@ def main
 
 		p "\n{pink}{filename}{clear}"
 		p lines_with_match.join("\n").replaceAll(pattern) do
-			"{green}{typeof replacement is 'string' ? replacement : $1}{clear}"
+			"{green}{substitute_match($1)}{clear}"
 
 		continue unless modify
 		try
-			writeFileSync(filename, data.replaceAll(pattern, replacement))
+			let new_data = data.replaceAll(pattern) do substitute_match($1)
+			writeFileSync(filename, new_data)
 			p "{cyan}Successfully wrote file{clear}"
 		catch e
 			p "{red}Error writing file\n\n{e}{clear}"
