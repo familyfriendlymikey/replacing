@@ -9,7 +9,7 @@ const help = "\nSee README for usage instructions: https://github.com/familyfrie
 const { readFileSync, writeFileSync, statSync } = require 'fs'
 const { execSync } = require 'child_process'
 const { diffLines } = require 'diff'
-const quit = do p "{help}\n\n{red}{$1}, quitting.{clear}"
+const quit = do p("{help}\n\n{red}{$1}, quitting.{clear}") and process.exit!
 
 main!
 
