@@ -3,20 +3,20 @@ const green = "\x1b[32m"
 const pink = "\x1b[35m"
 const red = "\x1b[31m"
 const cyan = "\x1b[36m"
-const blue = "\x1b[34m"
 const clear = "\x1b[0m"
 const help = "\nSee README for usage instructions: https://github.com/familyfriendlymikey/replacing"
 
-let { readFileSync, writeFileSync, statSync } = require 'fs'
-let { execSync } = require 'child_process'
-let quit = do p "{help}\n\n{red}{$1}, quitting.{clear}"
+const { readFileSync, writeFileSync, statSync } = require 'fs'
+const { execSync } = require 'child_process'
+const { diffLines } = require 'diff'
+const quit = do p "{help}\n\n{red}{$1}, quitting.{clear}"
 
 main!
 
 def main
 
 	try
-		var files = readFileSync('/dev/stdin').toString!.trim!.split("\n").sort!
+		var files = readFileSync('/dev/stdin','utf8').trim!.split("\n").sort!
 	catch e
 		return quit "Failed to read stdin:\n\n{e}"
 	
@@ -36,8 +36,7 @@ def main
 	if typeof (let replacement = args.shift!) is 'string'
 		p "\nREPLACEMENT: {cyan}{replacement}{clear}"
 		substitute_match = do
-			let r = replacement.replaceAll(/(?<!\\)&/g,"{blue}{$1}{green}")
-			r.replaceAll('\\&','&')
+			replacement.replaceAll(/(?<!\\)&/g,$1).replaceAll('\\&','&')
 	else
 		substitute_match = do $1
 
@@ -57,26 +56,32 @@ def main
 
 	return quit "Invalid args" if args.shift!
 
+	p!
 	for filename in files
 
 		unless pattern
 			p "{pink}{filename}{clear}"
 			continue
 
-		let data
+		let temp
 		try
 			continue unless statSync(filename).isFile!
-			data = readFileSync(filename).toString!
+			temp = readFileSync(filename).toString!
 		catch e
 			p "{red}{e}{clear}"
 			continue
+		const data = temp
 
-		let lines_with_match = data.split("\n").filter do pattern.test($1)
-		continue unless lines_with_match.length >= 1
-
-		p "\n{pink}{filename}{clear}"
-		p lines_with_match.join("\n").replace(pattern) do
+		let replaced = data.replace(pattern) do
 			"{green}{substitute_match($1)}{clear}"
+		
+		let to_print = ""
+		diffLines(data, replaced).forEach do
+			to_print += $1.value if $1.added
+
+		continue unless to_print.length >= 1
+		let dashes = "".padStart(filename.length, "-")
+		p "{pink}{filename}\n{dashes}{clear}\n{to_print}"
 
 		continue unless modify
 		try

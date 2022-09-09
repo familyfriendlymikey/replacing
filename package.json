@@ -13,5 +13,8 @@
     "url": "git+https://github.com/familyfriendlymikey/replacing.git"
   },
   "author": "Mikey Oz",
-  "homepage": "https://github.com/familyfriendlymikey/replacing#readme"
+  "homepage": "https://github.com/familyfriendlymikey/replacing#readme",
+  "dependencies": {
+    "diff": "^5.1.0"
+  }
 }
