@@ -3,6 +3,7 @@ const green = "\x1b[32m"
 const pink = "\x1b[35m"
 const red = "\x1b[31m"
 const cyan = "\x1b[36m"
+const blue = "\x1b[34m"
 const clear = "\x1b[0m"
 const help = "\nSee README for usage instructions: https://github.com/familyfriendlymikey/replacing"
 
@@ -24,17 +25,16 @@ def main
 
 	if typeof (let pattern = args.shift!) is 'string'
 		let [re, flags] = pattern.split(/(?<!\\)\//)
-		unless typeof flags is 'string'
-			flags ||= 'gi'
+		flags ??= 'gi'
 		try
 			pattern = new RegExp re, flags
 		catch
 			return quit "Invalid regex"
-		p "\nPATTERN: {cyan}{pattern}{clear}"
+		p "\nPATTERN: {blue}{pattern}{clear}"
 
 	let substitute_match
 	if typeof (let replacement = args.shift!) is 'string'
-		p "\nREPLACEMENT: {cyan}{replacement}{clear}"
+		p "\nREPLACEMENT: {blue}{replacement}{clear}"
 		substitute_match = do
 			replacement.replaceAll(/(?<!\\)&/g,$1).replaceAll('\\&','&')
 	else
@@ -48,15 +48,13 @@ def main
 
 	if modify and not force
 		try
-			let options = { encoding: 'utf8' }
-			if execSync('git status --porcelain', options)
+			if execSync('git status --porcelain').toString!
 				return quit 'Git working directory is not clean (-F to force)'
 		catch e
 			return quit 'Not a git repository (-F to force)'
 
 	return quit "Invalid args" if args.shift!
 
-	p!
 	for filename in files
 
 		try
@@ -81,12 +79,9 @@ def main
 			"{green}{substitute_match($1)}{clear}"
 		
 		let to_print = ""
-		diffLines(data, replaced).forEach do
-			to_print += $1.value if $1.added
-
+		diffLines(data, replaced).forEach do to_print += $1.value if $1.added
 		continue unless to_print.length >= 1
-		let dashes = "".padStart(filename.length, "-")
-		p "{pink}{filename}\n{dashes}{clear}\n{to_print.trim!}\n"
+		p "\n{pink}{filename}{clear}\n{to_print.trim!}"
 
 		continue unless modify
 		try
