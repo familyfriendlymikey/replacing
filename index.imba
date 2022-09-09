@@ -23,7 +23,13 @@ def main
 	let args = process.argv.slice(2)
 
 	if typeof (let pattern = args.shift!) is 'string'
-		pattern = new RegExp pattern, "g"
+		let [re, flags] = pattern.split(/(?<!\\)\//)
+		unless typeof flags is 'string'
+			flags ||= 'gi'
+		try
+			pattern = new RegExp re, flags
+		catch
+			return quit "Invalid regex"
 		p "\nPATTERN: {cyan}{pattern}{clear}"
 
 	let substitute_match
@@ -69,12 +75,12 @@ def main
 		continue unless lines_with_match.length >= 1
 
 		p "\n{pink}{filename}{clear}"
-		p lines_with_match.join("\n").replaceAll(pattern) do
+		p lines_with_match.join("\n").replace(pattern) do
 			"{green}{substitute_match($1)}{clear}"
 
 		continue unless modify
 		try
-			let new_data = data.replaceAll(pattern) do substitute_match($1)
+			let new_data = data.replace(pattern) do substitute_match($1)
 			writeFileSync(filename, new_data)
 			p "{cyan}Successfully wrote file{clear}"
 		catch e

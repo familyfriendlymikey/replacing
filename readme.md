@@ -16,7 +16,9 @@ cmd | rp [PATTERN [REPLACEMENT [MODIFY [FORCE]]]]
 The argument parsing for `rp` is positional and depends on the number of arguments provided:
 
 0. Simply print the sorted file paths passed through stdin.
-1. Print lines with text matching the specified regex pattern.
+1. Print lines with text matching the specified regex pattern. Default flags are `gi`.
+To specify custom flags, end your pattern with `/flags`. Ending your pattern with `/` indicates no flags.
+
 2. Print with replacements. Ampersands (`&`) in the replacement string will be substituted with the corresponding match.
 Literal ampersands can be specified with `\&`.
 3. Modify the input files accordingly. This argument *must* be `-M` and you must be in a clean working git directory.
