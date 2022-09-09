@@ -6,18 +6,18 @@ const cyan = "\x1b[36m"
 const clear = "\x1b[0m"
 const help = "\nSee README for usage instructions: https://github.com/familyfriendlymikey/replacing"
 
-let { readFileSync, writeFileSync } = require 'fs'
+let { readFileSync, writeFileSync, statSync } = require 'fs'
 let { execSync } = require 'child_process'
+let quit = do p "{help}\n\n{red}{$1}, quitting.{clear}"
 
 main!
 
 def main
 
-	let files
 	try
-		files = readFileSync(process.stdin.fd, 'utf8').trim!.split("\n")
-	catch
-		return p "{help}\n\n{red}Failed to read stdin, quitting.{clear}"
+		var files = readFileSync('/dev/stdin').toString!.trim!.split("\n").sort!
+	catch e
+		return quit "Failed to read stdin:\n\n{e}"
 	
 	let args = process.argv.slice(2)
 
@@ -25,42 +25,49 @@ def main
 		pattern = new RegExp pattern, "g"
 		p "\nPATTERN: {cyan}{pattern}{clear}"
 
-	if let replacement = args.shift!
+	if typeof (let replacement = args.shift!) is 'string'
 		p "\nREPLACEMENT: {cyan}{replacement}{clear}"
 
 	if let modify = args.shift!
-		try
-			throw '' unless modify is '-M'
-			let clean = !execSync 'git status --porcelain', { encoding: 'utf8' }
-			let force = args.shift! is '-F'
-			throw '' unless (clean or force)
-		catch
-			return p "{help}\n\n{red}Git working directory is not clean or invalid args, quitting.{clear}"
+		return quit 'Invalid args' unless modify is '-M'
 
-	if args.shift!
-		return p "{help}\n\n{red}Invalid args, quitting.{clear}"
+	if let force = args.shift!
+		return quit 'Invalid args' unless force is '-F'
+
+	if modify and not force
+		try
+			let options = { stdio: 'ignore', encoding: 'utf8' }
+			if execSync('git status --porcelain', options)
+				return quit 'Git working directory is not clean (-F to force)'
+		catch e
+			return quit 'Not a git repository (-F to force)'
+
+	return quit "Invalid args" if args.shift!
 
 	for filename in files
 
+		unless pattern
+			p "{pink}{filename}{clear}"
+			continue
+
 		let data
 		try
-			data = readFileSync(filename, 'utf8')
-		catch
-			p "\n{red}Error reading path, skipping:{clear} {filename}"
+			continue unless statSync(filename).isFile!
+			data = readFileSync(filename).toString!
+		catch e
+			p "{red}{e}{clear}"
 			continue
 
-		unless pattern
-			p "\n{pink}{filename}{clear}"
-			p data
-			continue
-
-		let lines = data.split("\n").filter do pattern.test($1)
-		continue unless lines.length >= 1
+		let lines_with_match = data.split("\n").filter do pattern.test($1)
+		continue unless lines_with_match.length >= 1
 
 		p "\n{pink}{filename}{clear}"
-		let s = lines.join("\n").replaceAll(pattern) do "{green}{replacement or $1}{clear}"
-		p s
+		p lines_with_match.join("\n").replaceAll(pattern) do
+			"{green}{typeof replacement is 'string' ? replacement : $1}{clear}"
 
 		continue unless modify
-		let new_data = data.replaceAll pattern, replacement
-		writeFileSync(filename, new_data)
+		try
+			writeFileSync(filename, data.replaceAll(pattern, replacement))
+			p "{cyan}Successfully wrote file{clear}"
+		catch e
+			p "{red}Error writing file\n\n{e}{clear}"
