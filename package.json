@@ -1,5 +1,15 @@
 {
-  "dependencies": {
-    "glob": "^8.0.3"
-  }
+  "name": "replacing",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "bin": { "rp": "dist/index.js" },
+  "scripts": {
+    "build": "./build.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/familyfriendlymikey/replace.git"
+  },
+  "author": "Mikey Oz",
+  "homepage": "https://github.com/familyfriendlymikey/replace#readme"
 }
