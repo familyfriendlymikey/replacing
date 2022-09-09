@@ -1,13 +1,9 @@
 ## What Is This
 
-`replace` (`rp`) takes lines of file paths from stdin and prints their contents,
+`replacing` (`rp`) takes lines of file paths from stdin and prints their contents,
 - optionally printing lines with text matching an ECMAScript regex pattern,
 - optionally printing with replacements,
 - optionally modifying the input files.
-
-Given that it is trivial to commit any currently existing changes to git,
-`rp` will not so much as run unless your working git directory is clean.
-If you want to run `rp` anyways, supply `--force` as the *very first* argument.
 
 ## Installation
 ```
@@ -15,13 +11,15 @@ npm i -g replacing
 ```
 
 ## Usage
+The argument parsing for `rp` is positional, and any configuration other than what is specified here will throw.
 ```
-rp [PATTERN] [REPLACEMENT] [FLAGS]
+cmd | rp [PATTERN [REPLACEMENT [MODIFY [FORCE]]]]
 ```
 - If 0 arguments, simply print the contents of the files passed through stdin.
-- If 1 argument, print lines with text matching an ECMAScript regex pattern.
-- If 2 arguments, print lines with matching text with replacements.
-- If the third argument is `-M`, modify the input files accordingly.
+- If 1 argument, print lines with text matching the specified regex pattern.
+- If 2 arguments, print matching text with replacements.
+- If the 3rd argument is `-M`, and the working git directory is clean, modify the input files accordingly.
+- If the 4th argument is `-F`, modify the input files regardless of git status.
 
 ## Examples
 
@@ -43,6 +41,11 @@ fd | rp 'config' 'store.config'
 Modify files replacing matched pattern `config` with text `store.config`:
 ```
 fd | rp 'config' 'store.config' -M
+```
+
+Modify regardless of git status:
+```
+fd | rp 'config' 'store.config' -M -F
 ```
 
 Lookarounds and word boundaries work. Print lines matching the WORD `config` not after `store.`, replacing the WORD config with `store.config`:
