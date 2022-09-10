@@ -56,12 +56,14 @@ def main
 
 	return quit "Invalid args" if args.shift!
 
+	let errors = []
+
 	for filename in files
 
 		try
 			continue unless statSync(filename).isFile!
 		catch e
-			output += "{red}{e}{clear}"
+			errors.push "{e}"
 			continue
 
 		unless pattern
@@ -72,7 +74,7 @@ def main
 		try
 			temp = readFileSync(filename).toString!
 		catch e
-			output += "{red}{e}{clear}"
+			errors.push "{e}"
 			continue
 		const data = temp
 
@@ -90,6 +92,9 @@ def main
 			writeFileSync(filename, new_data)
 			output += "{cyan}Successfully wrote file{clear}\n"
 		catch e
-			output += "{red}Error writing file\n\n{e}{clear}"
+			output += "{red}Failed to write file, see errors below{clear}\n"
+			errors.push "{e}"
 
 	p output
+	if errors.length > 0
+		p "{red}{errors.join("\n\n")}{clear}\n"
