@@ -1,18 +1,17 @@
 ## What Is This
-This is a search and replace tool that supports searching files with an ECMAScript regex pattern,
+This is a super lightweight (~100 lines of code) search and replace tool that supports searching files with an ECMAScript regex pattern,
 replacing that pattern with a string, and after printing to ensure everything is correct,
 modifying the input files with replacements.
 
 `rp` does as little in the way of custom logic as possible.
-The entire modification behavior of this program boils down to the following code:
+In fact, `rp` does not even search and replace linewise;
+the entire modification behavior of this program boils down to the following code:
 ```
 const data = readFileSync(filename).toString!
 let new_data = data.replace(pattern) do
 	replacement.replaceAll(/(?<!\\)&/g,$1).replaceAll('\\&','&')
 writeFileSync(filename, new_data)
 ```
-The previewing behavior is done with npm `diff`,
-and the git status failsafe is done with `execSync`.
 
 ## Installation
 ```
@@ -39,7 +38,7 @@ Literal ampersands can be specified with `\&`.
 
 ## Examples
 
-Print file contents of piped paths:
+Print the piped file paths, filtered to existing files only and sorted alphabetically:
 ```
 fd | rp
 ```
@@ -76,24 +75,21 @@ fd | rp '(?<!store\.)\bconfig\b' 'store.&'
 
 ## Tips
 
+### Clearing Scrollback
+Part of the usefulness of this program is the ability to revise and view new changes.
+If your terminal's scrollback buffer has several iterations of searches and replacements, it can feel a little messy.
+You might consider aliasing `fd` or whatever file-listing program you're using to clear the scrollback first:
+```
+alias fd='clear && fd'
+```
+If running `clear` doesn't clear your terminal's entire scrollback buffer, you might try:
+```
+alias fd='printf "\033c" && fd'
+```
+
 ### Excluding Files
 You can use all of the features of the piping program to narrow down your search.
 For example, to exclude any file beginning with `store`:
 ```
 fd -E store\*
 ```
-
-### Clearing Scrollback
-Part of the usefulness of this program is the ability to revise and view new changes.
-Without clearing the terminal's scrollback buffer, that can get a little messy.
-You might consider aliasing `fd` or whatever program you're using to clear the scrollback first:
-```
-alias fd='clear && fd'
-```
-If running `clear` doesn't clear your terminal's entire scrollback buffer, you can try:
-```
-alias fd='printf "\033c" && fd'
-```
-
-### Linewise Search And Replace
-`rp` does not do linewise search and replace, it tests your regex on the entire file.
