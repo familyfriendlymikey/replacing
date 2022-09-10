@@ -10,14 +10,16 @@ const help = "\nSee README for usage instructions: https://github.com/familyfrie
 const { readFileSync, writeFileSync, statSync } = require "fs"
 const { execSync } = require "child_process"
 const { diffLines } = require "diff"
-const quit = do p("{help}\n\n{red}{$1}, quitting.{clear}") and process.exit!
+const quit = do p("{help}\n\n{red}{$1}, quitting.{clear}\n") and process.exit!
 
 main!
 
 def main
 
+	let output = "\n"
+
 	try
-		var files = readFileSync("/dev/stdin","utf8").trim!.split("\n").sort!
+		var files = readFileSync("/dev/stdin", "utf8").trim!.split("\n").sort!
 	catch e
 		return quit "Failed to read stdin:\n\n{e}"
 	
@@ -29,11 +31,11 @@ def main
 			pattern = new RegExp(re, flags ?? "gi")
 		catch
 			return quit "Invalid regex"
-		p "\nPATTERN: {blue}{pattern}{clear}"
+		output += "PATTERN: {blue}{pattern}{clear}\n"
 
 	let substitute_match
 	if typeof (let replacement = args.shift!) is "string"
-		p "\nREPLACEMENT: {blue}{replacement}{clear}"
+		output += "\nREPLACEMENT: {blue}{replacement}{clear}\n"
 		substitute_match = do
 			replacement.replaceAll(/(?<!\\)&/g,$1).replaceAll("\\&","&")
 	else
@@ -59,18 +61,18 @@ def main
 		try
 			continue unless statSync(filename).isFile!
 		catch e
-			p "{red}{e}{clear}"
+			output += "{red}{e}{clear}"
 			continue
 
 		unless pattern
-			p "{pink}{filename}{clear}"
+			output += "{pink}{filename}{clear}\n"
 			continue
 
 		let temp
 		try
 			temp = readFileSync(filename).toString!
 		catch e
-			p "{red}{e}{clear}"
+			output += "{red}{e}{clear}"
 			continue
 		const data = temp
 
@@ -80,12 +82,14 @@ def main
 		let to_print = ""
 		diffLines(data, replaced).forEach do to_print += $1.value if $1.added
 		continue unless to_print.length >= 1
-		p "\n{pink}{filename}{clear}\n{to_print.trim!}"
+		output += "\n{pink}{filename}{clear}\n{to_print.trim!}\n"
 
 		continue unless modify
 		try
 			let new_data = data.replace(pattern) do substitute_match($1)
 			writeFileSync(filename, new_data)
-			p "{cyan}Successfully wrote file{clear}"
+			output += "{cyan}Successfully wrote file{clear}\n"
 		catch e
-			p "{red}Error writing file\n\n{e}{clear}"
+			output += "{red}Error writing file\n\n{e}{clear}"
+
+	p output
