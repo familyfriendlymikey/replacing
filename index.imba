@@ -47,12 +47,12 @@ def main
 
 	if modify and not force
 		try
-			if execSync('git status --porcelain').toString!
+			if execSync('git status --porcelain', { stdio: 'pipe' }).toString!
 				return quit 'Git working directory is not clean (-F to force)'
 		catch e
-			return quit 'Not a git repository (-F to force)'
+			return quit 'Failed to check git status (-F to force)'
 
-	return quit "Invalid args" if args.shift!
+	return quit 'Invalid args' if args.shift!
 
 	for filename in files
 
