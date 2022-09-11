@@ -1,7 +1,10 @@
 ## What Is This
-This is a super lightweight (~100 lines of code) search and replace tool that supports searching files with an ECMAScript regex pattern,
-replacing that pattern with a string, and after printing to ensure everything is correct,
-modifying the input files with replacements.
+This is a super lightweight (~100 lines of code) search and replace tool.
+
+Simply put, the incremental workflow is:
+```
+list files -> print matches -> replace matches -> make modifications
+```
 
 `rp` does as little in the way of custom logic as possible.
 In fact, `rp` does not even search and replace linewise;
