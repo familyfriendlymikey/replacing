@@ -78,21 +78,14 @@ fd | rp '(?<!store\.)\bconfig\b' 'store.&'
 
 ## Tips
 
-### Clearing Scrollback
-Part of the usefulness of this program is the ability to revise and view new changes.
-If your terminal's scrollback buffer has several iterations of searches and replacements, it can feel a little messy.
-You might consider aliasing `fd` or whatever file-listing program you're using to clear the scrollback first:
+### Git Working Directory Usage
+You might find it annoying to make a commit before modifying.
+Something to speed that up is an alias like this:
 ```
-alias fd='clear && fd'
+alias gfixup='git commit -a --amend --no-edit'
 ```
-If running `clear` doesn't clear your terminal's entire scrollback buffer, you might try:
-```
-alias fd='printf "\033c" && fd'
-```
-
-### Excluding Files
-You can use all of the features of the piping program to narrow down your search.
-For example, to exclude any file beginning with `store`:
-```
-fd -E store\*
-```
+This just shoves all modifications into the previous commit.
+So, you can make a commit for your changes before running `rp`,
+which you would have done anyways,
+and then after running `rp`, once you make sure the changes look good,
+you can just run `gfixup`.
