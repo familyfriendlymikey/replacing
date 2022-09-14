@@ -51,13 +51,9 @@ def get_files_e
 		def exclude dir_name, dir_path
 			if args.exclude.some(do $1.test dir_path)
 				excluded_dirs.push dir_path
-				return yes
-			return no unless args.include.length >= 1
-			if args.include.some(do $1.test dir_path)
-				no
-			else
-				implicitly_excluded_dirs.push dir_path
 				yes
+			else
+				no
 
 		def filter path, isdir
 			if args.exclude.some(do $1.test path)
@@ -105,7 +101,7 @@ def parse_args_e
 	let argv = process.argv.slice(2)
 	while arg = argv.shift!
 		if arg is '-c'
-			p '\x1bc'
+			args.noclear = yes
 		elif arg is '-e'
 			args.exclude.push create_regex_e(argv.shift!, "i")
 		elif arg is '-i'
@@ -115,9 +111,9 @@ def parse_args_e
 		elif arg is '-v'
 			args.verbose = yes
 		elif arg is '-M'
+			args.modify = yes
 			arg = argv.shift!
 			if arg == null
-				args.modify = yes
 				break
 			elif arg is '-F' and argv.shift! == null
 				args.force = yes
@@ -149,6 +145,9 @@ def main
 	catch e
 		fatal e
 
+	unless args.noclear
+		p '\x1bc'
+
 	let files
 	try
 		files = await get_files_e args
@@ -167,7 +166,7 @@ def main
 		try
 			if execSync("git status --porcelain", { stdio: "pipe" }).toString!
 				fatal "Git working directory is not clean (-F to force)"
-		catch e
+		catch
 			fatal "Failed to check git status (-F to force)"
 
 	let substitute_match
@@ -188,7 +187,7 @@ def main
 
 		let replaced = data.replace(args.pattern) do
 			"{green}{substitute_match($1)}{clear}"
-		
+
 		let to_print = ""
 		diffLines(data, replaced).forEach do to_print += $1.value if $1.added
 		continue unless to_print.length >= 1
