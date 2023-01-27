@@ -2,18 +2,14 @@ global.L = console.log
 
 import 'colors'
 
-const help = "\nSee README for usage instructions: https://github.com/familyfriendlymikey/replacing"
-
 const { readFileSync, writeFileSync, statSync } = require "fs"
 const { execSync } = require "child_process"
 const { diffLines } = require "diff"
 
 def quit
-	L "{help}\n\n"
+	L "\nSee README for usage instructions: https://github.com/familyfriendlymikey/replacing\n\n"
 	L "{$1}, quitting.\n".red
 	process.exit!
-
-main!
 
 def main
 
@@ -23,7 +19,7 @@ def main
 		var files = readFileSync("/dev/stdin", "utf8").trim!.split("\n").sort!
 	catch e
 		return quit "Failed to read stdin:\n\n{e}"
-	
+
 	let args = process.argv.slice(2)
 
 	if typeof (let pattern = args.shift!) is "string"
@@ -99,3 +95,5 @@ def main
 	L output
 	if errors.length > 0
 		L "{errors.join("\n\n")}\n".red
+
+main!
