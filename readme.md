@@ -96,3 +96,20 @@ For example, to exclude any file beginning with `store`:
 ```
 fd -E store\*
 ```
+
+## Tips
+
+### Git Working Directory Usage
+
+You might find it annoying to make a commit before modifying.
+Something to speed that up is an alias like this:
+
+```
+alias gfixup='git commit -a --amend --no-edit'
+```
+
+This just shoves all modifications into the previous commit.
+So, you can make a commit for your changes before running `rp`,
+which you would have done anyways,
+and then after running `rp`, once you make sure the changes look good,
+you can just run `gfixup`.
