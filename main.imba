@@ -1,6 +1,18 @@
 global.L = console.log
 
-import 'colors'
+extend class String
+	get green
+		"\x1b[32m{self}\x1b[0m"
+	get yellow
+		"\x1b[33m{self}\x1b[0m"
+	get pink
+		"\x1b[35m{self}\x1b[0m"
+	get red
+		"\x1b[31m{self}\x1b[0m"
+	get cyan
+		"\x1b[36m{self}\x1b[0m"
+	get blue
+		"\x1b[34m{self}\x1b[0m"
 
 const { readFileSync, writeFileSync, statSync } = require "fs"
 const { execSync } = require "child_process"
@@ -81,10 +93,10 @@ def main
 		let to_print = ""
 		diffLines(data, replaced).forEach do
 			if $1.added
-				if $1.value.length < 100
+				if $1.value.length < 1000
 					to_print += $1.value
 				else
-					to_print += "[Omitted long line]\n".yellow
+					to_print += "[Omitted line with > 1000 chars]\n".yellow
 		continue unless to_print.length >= 1
 		output += "\n{filename.pink}\n{to_print.trim!}\n"
 

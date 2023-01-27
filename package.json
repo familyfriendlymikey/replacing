@@ -15,7 +15,6 @@
   "author": "Mikey Oz",
   "homepage": "https://github.com/familyfriendlymikey/replacing#readme",
   "dependencies": {
-    "colors": "^1.4.0",
     "diff": "^5.1.0"
   }
 }
