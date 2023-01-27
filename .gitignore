@@ -3,3 +3,4 @@ test_backup
 *.swp
 .DS_Store
 dist
+temp
