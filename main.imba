@@ -35,7 +35,7 @@ def main
 	let args = process.argv.slice(2)
 
 	if typeof (let pattern = args.shift!) is "string"
-		let [re, flags] = pattern.split(/(?<!\\)\//)
+		let [re, flags] = pattern.split(/\\\//)
 		try
 			pattern = new RegExp(re, flags ?? "gi")
 		catch
