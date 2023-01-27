@@ -25,7 +25,7 @@ def quit
 
 def main
 
-	let output = "\n"
+	L!
 
 	try
 		var files = readFileSync("/dev/stdin", "utf8").trim!.split("\n").sort!
@@ -40,11 +40,11 @@ def main
 			pattern = new RegExp(re, flags ?? "gi")
 		catch
 			return quit "Invalid regex"
-		output += "PATTERN: {pattern}\n".blue
+		L "PATTERN: {pattern}".blue
 
 	let substitute_match
 	if typeof (let replacement = args.shift!) is "string"
-		output += "\nREPLACEMENT: {replacement}\n".blue
+		L "\nREPLACEMENT: {replacement}".blue
 		substitute_match = do
 			replacement.replaceAll(/(?<!\\)&/g,$1).replaceAll("\\&","&")
 	else
@@ -76,40 +76,42 @@ def main
 			continue
 
 		unless pattern
-			output += "{filename.pink}\n"
+			L filename.pink
 			continue
 
 		let temp
 		try
-			temp = readFileSync(filename).toString!
+			temp = readFileSync(filename,'utf8')
 		catch e
 			errors.push "{e}"
 			continue
 		const data = temp
 
+		# L "REPLACING {filename}".green
 		let replaced = data.replace(pattern) do
 			substitute_match($1).green
-		
+
+		# L "DIFFING {filename}".green
 		let to_print = ""
 		diffLines(data, replaced).forEach do
 			if $1.added
 				if $1.value.length < 1000
 					to_print += $1.value
 				else
-					to_print += "[Omitted line with > 1000 chars]\n".yellow
+					to_print += "[Omitted line with > 1000 chars]".yellow
+					to_print += "\n" # can't trim if this is wrapped with yellow
 		continue unless to_print.length >= 1
-		output += "\n{filename.pink}\n{to_print.trim!}\n"
+		L "\n{filename.pink}\n{to_print.trim!}"
 
 		continue unless modify
 		try
 			let new_data = data.replace(pattern) do substitute_match($1)
 			writeFileSync(filename, new_data)
-			output += "Successfully wrote file\n".cyan
+			L "Successfully wrote file".cyan
 		catch e
-			output += "Failed to write file, see errors below\n".red
+			L "Failed to write file, see errors below".red
 			errors.push "{e}"
 
-	L output
 	if errors.length > 0
 		L "{errors.join("\n\n")}\n".red
 
