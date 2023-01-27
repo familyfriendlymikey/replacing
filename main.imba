@@ -79,7 +79,12 @@ def main
 			substitute_match($1).green
 		
 		let to_print = ""
-		diffLines(data, replaced).forEach do to_print += $1.value if $1.added
+		diffLines(data, replaced).forEach do
+			if $1.added
+				if $1.value.length < 100
+					to_print += $1.value
+				else
+					to_print += "[Omitted long line]\n".yellow
 		continue unless to_print.length >= 1
 		output += "\n{filename.pink}\n{to_print.trim!}\n"
 
