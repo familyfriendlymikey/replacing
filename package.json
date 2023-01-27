@@ -3,10 +3,10 @@
   "version": "1.1.4",
   "main": "dist/index.js",
   "bin": {
-    "rp": "dist/main.sh"
+    "rp": "dist/index.js"
   },
   "scripts": {
-    "build": "echo '#! /usr/bin/env node' > dist/index.js && imbac -p index.imba >> dist/index.js"
+    "build": "./build.sh"
   },
   "repository": {
     "type": "git",
@@ -15,7 +15,6 @@
   "author": "Mikey Oz",
   "homepage": "https://github.com/familyfriendlymikey/replacing#readme",
   "dependencies": {
-    "diff": "^5.1.0",
-    "fdir": "^5.2.0"
+    "diff": "^5.1.0"
   }
 }
