@@ -4,3 +4,4 @@ test_backup
 .DS_Store
 dist
 temp
+*.js
