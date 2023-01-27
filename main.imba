@@ -1,4 +1,4 @@
-const p = console.log
+global.L = console.log
 
 import 'colors'
 
@@ -9,8 +9,8 @@ const { execSync } = require "child_process"
 const { diffLines } = require "diff"
 
 def quit
-	p "{help}\n\n"
-	p "{$1}, quitting.\n".red
+	L "{help}\n\n"
+	L "{$1}, quitting.\n".red
 	process.exit!
 
 main!
@@ -96,6 +96,6 @@ def main
 			output += "Failed to write file, see errors below\n".red
 			errors.push "{e}"
 
-	p output
+	L output
 	if errors.length > 0
-		p "{errors.join("\n\n")}\n".red
+		L "{errors.join("\n\n")}\n".red
