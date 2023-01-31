@@ -87,25 +87,23 @@ def main
 			continue
 		const data = temp
 
-		# L "REPLACING {filename}".green
 		let replaced = data.replace(pattern) do
 			substitute_match($1).green
 
-		# L "DIFFING {filename}".green
-		let to_print = ""
+		let to-print = ""
 		diffLines(data, replaced).forEach do
 			if $1.added
 				if $1.value.length < 1000
-					to_print += $1.value
+					to-print += $1.value
 				else
-					to_print += "[Omitted line with > 1000 chars]".yellow
-					to_print += "\n" # can't trim if this is wrapped with yellow
-		continue unless to_print.length >= 1
-		L "\n{filename.pink}\n{to_print.trim!}"
+					to-print += "[Omitted line with > 1000 chars]".yellow
+					to-print += "\n" # can't trim if this is wrapped with yellow
+		continue unless to-print.length >= 1
+		L "\n{filename.pink}\n{to-print.trim!}"
 
 		continue unless modify
 		try
-			let new_data = data.replace(pattern) do substitute_match($1)
+			let new_data = data.replace(pattern, substitute_match)
 			writeFileSync(filename, new_data)
 			L "Successfully wrote file".cyan
 		catch e
