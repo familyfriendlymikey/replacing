@@ -1,6 +1,6 @@
 {
   "name": "replacing",
-  "version": "1.1.4",
+  "version": "1.2.0",
   "main": "main.js",
   "bin": {
     "replacing": "main.js"
