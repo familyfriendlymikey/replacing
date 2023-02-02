@@ -37,7 +37,7 @@ def main
 	if typeof (let pattern = args.shift!) is "string"
 		let [re, flags] = pattern.split(/\\\//)
 		try
-			pattern = new RegExp(re, flags ?? "gi")
+			pattern = new RegExp(re, flags ?? "gim")
 		catch
 			return quit "Invalid regex"
 		L "PATTERN: {pattern}".blue
