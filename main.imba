@@ -16,7 +16,7 @@ extend class String
 
 global.E = do
 	L "\nSee README for usage instructions: https://github.com/familyfriendlymikey/replacing\n"
-	L "{$1}, quitting.\n".red
+	console.error String($1).red
 	process.exit!
 
 const fs = require "fs"
