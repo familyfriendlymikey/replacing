@@ -33,7 +33,7 @@ alias r='fd|replacing'
 r [PATTERN [REPLACEMENT [MODIFY]]]
 ```
 
-The argument parsing for `rp` is positional and depends on the number
+The argument parsing for `replacing` is positional and depends on the number
 of arguments provided:
 
 0. Simply print the sorted file paths passed through stdin.
