@@ -14,14 +14,14 @@ extend class String
 	get blue
 		"\x1b[34m{self}\x1b[0m"
 
-const { readFileSync, writeFileSync, statSync } = require "fs"
-const { execSync } = require "child_process"
-const { diffLines } = require "diff"
-
-def quit
+global.E = do
 	L "\nSee README for usage instructions: https://github.com/familyfriendlymikey/replacing\n"
 	L "{$1}, quitting.\n".red
 	process.exit!
+
+const { readFileSync, writeFileSync, statSync } = require "fs"
+const { execSync } = require "child_process"
+const { diffLines } = require "diff"
 
 def main
 
@@ -30,7 +30,7 @@ def main
 	try
 		var files = readFileSync("/dev/stdin", "utf8").trim!.split("\n").sort!
 	catch e
-		return quit "Failed to read stdin:\n\n{e}"
+		E "Failed to read stdin:\n\n{e}"
 
 	let args = process.argv.slice(2)
 	let arg
@@ -42,7 +42,7 @@ def main
 			let default-flags = /[A-Z]/.test(re) ? 'gm' : 'gim'
 			pattern = new RegExp(re, flags ?? default-flags)
 		catch
-			return quit "Invalid regex"
+			E "Invalid regex"
 		L "PATTERN: {pattern}".blue
 
 	let substitute_match
@@ -63,16 +63,16 @@ def main
 			modify = yes
 			force = yes
 		else
-			return quit "Invalid args"
+			E "Invalid args"
 
 	if modify and not force
 		try
 			if execSync("git status --porcelain", { stdio: "pipe" }).toString!
-				return quit "Git working directory is not clean (-mf to force)"
+				E "Git working directory is not clean (-mf to force)"
 		catch e
-			return quit "Failed to check git status (-mf to force)"
+			E "Failed to check git status (-mf to force)"
 
-	return quit "Invalid args" if args.shift!
+	E "Invalid args" if args.shift!
 
 	let errors = []
 
