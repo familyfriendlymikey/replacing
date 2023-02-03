@@ -6,8 +6,8 @@
     "replacing": "main.js"
   },
   "scripts": {
-    "prepack": "npm run build",
-    "build": "imbac --bin bun main.imba"
+    "build": "imbac --bin bun main.imba",
+    "prepack": "npm run build"
   },
   "repository": {
     "type": "git",

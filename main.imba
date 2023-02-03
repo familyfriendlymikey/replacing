@@ -33,35 +33,44 @@ def main
 		return quit "Failed to read stdin:\n\n{e}"
 
 	let args = process.argv.slice(2)
+	let arg
 
-	if typeof (let pattern = args.shift!) is "string"
+	let pattern = args.shift!
+	if typeof pattern is "string"
 		let [re, flags] = pattern.split(/\\\//)
 		try
-			pattern = new RegExp(re, flags ?? "gim")
+			let default-flags = /[A-Z]/.test(re) ? 'gm' : 'gim'
+			pattern = new RegExp(re, flags ?? default-flags)
 		catch
 			return quit "Invalid regex"
 		L "PATTERN: {pattern}".blue
 
 	let substitute_match
-	if typeof (let replacement = args.shift!) is "string"
+	let replacement = args.shift!
+	if typeof replacement is "string"
 		L "\nREPLACEMENT: {replacement}".blue
 		substitute_match = do
 			replacement.replaceAll(/(?<!\\)&/g,$1).replaceAll("\\&","&")
 	else
 		substitute_match = do $1
 
-	if let modify = args.shift!
-		return quit "Invalid args" unless modify is "-M"
-
-	if let force = args.shift!
-		return quit "Invalid args" unless force is "-F"
+	let modify
+	let force
+	if arg = args.shift!
+		if arg is "-m"
+			modify = yes
+		elif arg is "-mf"
+			modify = yes
+			force = yes
+		else
+			return quit "Invalid args"
 
 	if modify and not force
 		try
 			if execSync("git status --porcelain", { stdio: "pipe" }).toString!
-				return quit "Git working directory is not clean (-F to force)"
+				return quit "Git working directory is not clean (-mf to force)"
 		catch e
-			return quit "Failed to check git status (-F to force)"
+			return quit "Failed to check git status (-mf to force)"
 
 	return quit "Invalid args" if args.shift!
 
