@@ -25,8 +25,6 @@ const { diffLines } = require "diff"
 
 def main
 
-	L!
-
 	try
 		var files = fs.readFileSync("/dev/stdin", "utf8").trim!.split("\n").sort!
 	catch e
