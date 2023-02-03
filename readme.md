@@ -4,7 +4,7 @@ This is a super lightweight CLI for searching and replacing file contents with
 ECMAScript regex.
 
 `replacing` does as little in the way of custom logic as possible. In fact, it
-does not even search and replace linewise, it simply calls `replaceAll` on the
+does not even search and replace linewise, it simply calls `replace` on the
 entire input text and prints the linewise diff.
 
 ## Installation
