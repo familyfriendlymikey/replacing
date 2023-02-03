@@ -19,8 +19,8 @@ global.E = do
 	L "{$1}, quitting.\n".red
 	process.exit!
 
-const { readFileSync, writeFileSync, statSync } = require "fs"
-const { execSync } = require "child_process"
+const fs = require "fs"
+const cp = require "child_process"
 const { diffLines } = require "diff"
 
 def main
@@ -28,7 +28,7 @@ def main
 	L!
 
 	try
-		var files = readFileSync("/dev/stdin", "utf8").trim!.split("\n").sort!
+		var files = fs.readFileSync("/dev/stdin", "utf8").trim!.split("\n").sort!
 	catch e
 		E "Failed to read stdin:\n\n{e}"
 
@@ -45,14 +45,14 @@ def main
 			E "Invalid regex"
 		L "PATTERN: {pattern}".blue
 
-	let substitute_match
+	let substitute-match
 	let replacement = args.shift!
 	if typeof replacement is "string"
 		L "\nREPLACEMENT: {replacement}".blue
-		substitute_match = do
+		substitute-match = do
 			replacement.replaceAll(/(?<!\\)&/g,$1).replaceAll("\\&","&")
 	else
-		substitute_match = do $1
+		substitute-match = do $1
 
 	let modify
 	let force
@@ -60,14 +60,13 @@ def main
 		if arg is "-m"
 			modify = yes
 		elif arg is "-mf"
-			modify = yes
-			force = yes
+			modify = force = yes
 		else
 			E "Invalid args"
 
 	if modify and not force
 		try
-			if execSync("git status --porcelain", { stdio: "pipe" }).toString!
+			if cp.execSync("git status --porcelain", { stdio: "pipe" }).toString!
 				E "Git working directory is not clean (-mf to force)"
 		catch e
 			E "Failed to check git status (-mf to force)"
@@ -79,7 +78,7 @@ def main
 	for filename in files
 
 		try
-			continue unless statSync(filename).isFile!
+			continue unless fs.statSync(filename).isFile!
 		catch e
 			errors.push "{e}"
 			continue
@@ -90,14 +89,14 @@ def main
 
 		let temp
 		try
-			temp = readFileSync(filename,'utf8')
+			temp = fs.readFileSync(filename,'utf8')
 		catch e
 			errors.push "{e}"
 			continue
 		const data = temp
 
 		let replaced = data.replace(pattern) do
-			substitute_match($1).green
+			substitute-match($1).green
 
 		let to-print = ""
 		diffLines(data, replaced).forEach do
@@ -112,8 +111,8 @@ def main
 
 		continue unless modify
 		try
-			let new_data = data.replace(pattern, substitute_match)
-			writeFileSync(filename, new_data)
+			let new-data = data.replace(pattern, substitute-match)
+			fs.writeFileSync(filename, new-data)
 			L "Successfully wrote file".cyan
 		catch e
 			L "Failed to write file, see errors below".red
