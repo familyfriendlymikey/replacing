@@ -19,7 +19,7 @@ const { execSync } = require "child_process"
 const { diffLines } = require "diff"
 
 def quit
-	L "\nSee README for usage instructions: https://github.com/familyfriendlymikey/replacing\n\n"
+	L "\nSee README for usage instructions: https://github.com/familyfriendlymikey/replacing\n"
 	L "{$1}, quitting.\n".red
 	process.exit!
 
